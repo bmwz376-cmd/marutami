@@ -9,7 +9,11 @@
       "page_id": "001",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/001.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/001.jpg",
-      "instructor_notes": [],
+      "instructor_notes": [
+        "タイトルページ：建築施工管理を目指すエンジニアのための建築基礎講座",
+        "鉄筋工事１は配筋の基本を学ぶ重要な単元",
+        "全18ページで配筋検査に必要な基礎知識を習得"
+      ],
       "glossary": [],
       "checklist": [],
       "highlights": []
@@ -19,7 +23,11 @@
       "page_id": "002",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/002.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/002.jpg",
-      "instructor_notes": [],
+      "instructor_notes": [
+        "講義の全体構成を確認",
+        "配筋の基本1〜16まで体系的に学習",
+        "各項目は実務で即使える内容"
+      ],
       "glossary": [],
       "checklist": [],
       "highlights": []
@@ -29,9 +37,31 @@
       "page_id": "003",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/003.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/003.jpg",
-      "instructor_notes": [],
-      "glossary": [],
-      "checklist": [],
+      "instructor_notes": [
+        "配筋の基本：鉄筋はコンクリートの引張力を受け持つ",
+        "コンクリート単体では引張に弱い",
+        "鉄筋とコンクリートの複合構造が鉄筋コンクリート（RC）"
+      ],
+      "glossary": [
+        {
+          "term": "配筋",
+          "definition": "鉄筋を設計図通りに配置すること",
+          "importance": "high"
+        },
+        {
+          "term": "RC造",
+          "definition": "鉄筋コンクリート造（Reinforced Concrete）の略称",
+          "importance": "high"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "check_3_1",
+          "text": "鉄筋の役割を理解している",
+          "checked": false,
+          "note": "引張力を受け持つことが重要"
+        }
+      ],
       "highlights": []
     },
     {
@@ -39,9 +69,40 @@
       "page_id": "004",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/004.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/004.jpg",
-      "instructor_notes": [],
-      "glossary": [],
-      "checklist": [],
+      "instructor_notes": [
+        "鉄筋の種類と表示方法",
+        "SD295A、SD345など規格による分類",
+        "数字は降伏点強度を表す（N/mm²）"
+      ],
+      "glossary": [
+        {
+          "term": "SD295A",
+          "definition": "降伏点強度295N/mm²の異形鉄筋",
+          "importance": "high"
+        },
+        {
+          "term": "SD345",
+          "definition": "降伏点強度345N/mm²の異形鉄筋",
+          "importance": "high"
+        },
+        {
+          "term": "異形鉄筋",
+          "definition": "表面に突起（リブ）がある鉄筋。コンクリートとの付着性が高い",
+          "importance": "high"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "check_4_1",
+          "text": "鉄筋の種類（SD295A, SD345等）を識別できる",
+          "checked": false
+        },
+        {
+          "id": "check_4_2",
+          "text": "降伏点強度の意味を理解している",
+          "checked": false
+        }
+      ],
       "highlights": []
     },
     {
@@ -49,9 +110,41 @@
       "page_id": "005",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/005.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/005.jpg",
-      "instructor_notes": [],
-      "glossary": [],
-      "checklist": [],
+      "instructor_notes": [
+        "定着と重ね継手の基本",
+        "定着長さは鉄筋径の40倍が基準",
+        "重ね継手長さは引張定着長さの1.0倍以上"
+      ],
+      "glossary": [
+        {
+          "term": "定着",
+          "definition": "鉄筋をコンクリート内に埋め込み、引張力を伝達させること",
+          "importance": "high"
+        },
+        {
+          "term": "重ね継手",
+          "definition": "鉄筋を重ね合わせて接合する方法",
+          "importance": "high"
+        },
+        {
+          "term": "定着長さ",
+          "definition": "鉄筋の応力を確実にコンクリートに伝達するために必要な長さ",
+          "importance": "high"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "check_5_1",
+          "text": "定着長さの計算方法を理解している",
+          "checked": false,
+          "note": "基本は鉄筋径の40倍"
+        },
+        {
+          "id": "check_5_2",
+          "text": "重ね継手長さの基準を把握している",
+          "checked": false
+        }
+      ],
       "highlights": []
     },
     {
@@ -59,9 +152,37 @@
       "page_id": "006",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/006.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/006.jpg",
-      "instructor_notes": [],
-      "glossary": [],
-      "checklist": [],
+      "instructor_notes": [
+        "鉄筋のあき（間隔）の基本",
+        "粗骨材最大寸法の1.25倍以上",
+        "鉄筋径の1.5倍以上",
+        "25mm以上（3つの条件のうち最大値）"
+      ],
+      "glossary": [
+        {
+          "term": "あき",
+          "definition": "隣り合う鉄筋の表面間の距離",
+          "importance": "high"
+        },
+        {
+          "term": "粗骨材",
+          "definition": "コンクリート用の砂利。最大寸法は通常20mm程度",
+          "importance": "medium"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "check_6_1",
+          "text": "鉄筋のあきの3条件を理解している",
+          "checked": false,
+          "note": "粗骨材1.25倍、鉄筋径1.5倍、25mm以上"
+        },
+        {
+          "id": "check_6_2",
+          "text": "現場で適切なあきを確認できる",
+          "checked": false
+        }
+      ],
       "highlights": []
     },
     {
@@ -69,9 +190,36 @@
       "page_id": "007",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/007.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/007.jpg",
-      "instructor_notes": [],
-      "glossary": [],
-      "checklist": [],
+      "instructor_notes": [
+        "かぶりの基本",
+        "かぶりは鉄筋の錆防止とコンクリートとの一体化に重要",
+        "部位・環境により基準値が異なる"
+      ],
+      "glossary": [
+        {
+          "term": "かぶり",
+          "definition": "鉄筋表面からコンクリート表面までの最短距離",
+          "importance": "high"
+        },
+        {
+          "term": "最小かぶり厚さ",
+          "definition": "建築基準法で定められた部位ごとの最小値",
+          "importance": "high"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "check_7_1",
+          "text": "かぶりの定義を正確に理解している",
+          "checked": false
+        },
+        {
+          "id": "check_7_2",
+          "text": "部位ごとの最小かぶり厚さを把握している",
+          "checked": false,
+          "note": "柱・梁30mm、スラブ20mm、基礎60mm等"
+        }
+      ],
       "highlights": []
     },
     {
@@ -79,9 +227,45 @@
       "page_id": "008",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/008.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/008.jpg",
-      "instructor_notes": [],
-      "glossary": [],
-      "checklist": [],
+      "instructor_notes": [
+        "鉄筋の役割と呼称",
+        "主筋・配力筋・あばら筋・帯筋の役割を明確に",
+        "構造部位により配筋方法が異なる"
+      ],
+      "glossary": [
+        {
+          "term": "主筋",
+          "definition": "主要な力（曲げモーメント等）を受け持つ鉄筋",
+          "importance": "high"
+        },
+        {
+          "term": "配力筋",
+          "definition": "スラブで主筋と直交して配置される鉄筋",
+          "importance": "high"
+        },
+        {
+          "term": "あばら筋",
+          "definition": "梁のせん断補強筋",
+          "importance": "high"
+        },
+        {
+          "term": "帯筋",
+          "definition": "柱の主筋を取り囲む補強筋",
+          "importance": "high"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "check_8_1",
+          "text": "各鉄筋の役割を説明できる",
+          "checked": false
+        },
+        {
+          "id": "check_8_2",
+          "text": "構造図で鉄筋の種類を識別できる",
+          "checked": false
+        }
+      ],
       "highlights": []
     },
     {
@@ -89,9 +273,26 @@
       "page_id": "009",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/009.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/009.jpg",
-      "instructor_notes": [],
-      "glossary": [],
-      "checklist": [],
+      "instructor_notes": [
+        "継手位置の基本",
+        "応力の小さい位置に配置",
+        "同一断面での重ね継手は全数の1/2以下"
+      ],
+      "glossary": [
+        {
+          "term": "継手位置",
+          "definition": "鉄筋の接合箇所の配置位置",
+          "importance": "medium"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "check_9_1",
+          "text": "継手位置の原則を理解している",
+          "checked": false,
+          "note": "応力の小さい位置、分散配置"
+        }
+      ],
       "highlights": []
     },
     {
@@ -99,9 +300,30 @@
       "page_id": "010",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/010.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/010.jpg",
-      "instructor_notes": [],
-      "glossary": [],
-      "checklist": [],
+      "instructor_notes": [
+        "帯筋・あばら筋の配置基準",
+        "フック形状と定着の重要性",
+        "間隔の規定を確認"
+      ],
+      "glossary": [
+        {
+          "term": "フック",
+          "definition": "鉄筋端部を曲げて定着性を高める処理",
+          "importance": "high"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "check_10_1",
+          "text": "帯筋・あばら筋の配置間隔を確認できる",
+          "checked": false
+        },
+        {
+          "id": "check_10_2",
+          "text": "フックの形状が適切か確認できる",
+          "checked": false
+        }
+      ],
       "highlights": []
     },
     {
@@ -179,11 +401,68 @@
       "page_id": "018",
       "image_url": "/static/materials/⑧鉄筋工事１/pages/018.jpg",
       "thumbnail_url": "/static/materials/⑧鉄筋工事１/thumbs/018.jpg",
-      "instructor_notes": [],
+      "instructor_notes": [
+        "まとめ：配筋検査の重要ポイント",
+        "定着・かぶり・あき・継手位置の確認が基本",
+        "次回は実際の配筋検査要領を学習"
+      ],
       "glossary": [],
-      "checklist": [],
+      "checklist": [
+        {
+          "id": "check_18_1",
+          "text": "配筋の基本用語を全て理解した",
+          "checked": false
+        },
+        {
+          "id": "check_18_2",
+          "text": "構造図の見方を習得した",
+          "checked": false
+        },
+        {
+          "id": "check_18_3",
+          "text": "配筋検査で何を確認すべきか理解した",
+          "checked": false
+        }
+      ],
       "highlights": []
     }
   ],
-  "chapters": []
+  "chapters": [
+    {
+      "id": "chapter_1",
+      "title": "配筋の基本",
+      "order": 1,
+      "pages": [1, 2, 3]
+    },
+    {
+      "id": "chapter_2",
+      "title": "鉄筋の種類と表示",
+      "order": 2,
+      "pages": [4]
+    },
+    {
+      "id": "chapter_3",
+      "title": "定着・重ね継手",
+      "order": 3,
+      "pages": [5]
+    },
+    {
+      "id": "chapter_4",
+      "title": "あきとかぶり",
+      "order": 4,
+      "pages": [6, 7]
+    },
+    {
+      "id": "chapter_5",
+      "title": "鉄筋の役割と配置",
+      "order": 5,
+      "pages": [8, 9, 10]
+    },
+    {
+      "id": "chapter_6",
+      "title": "まとめ",
+      "order": 6,
+      "pages": [18]
+    }
+  ]
 }
