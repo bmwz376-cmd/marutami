@@ -1,1 +1,54 @@
-[]
+[
+  {
+    "id": "1bc05508-259d-4211-b6a3-95c10a06a707",
+    "timestamp": "2026-01-07T12:41:27.631784",
+    "room_id": "test_lecture_001",
+    "user_role": "student",
+    "user_name": "受講者A",
+    "rating_sync_speed": 5,
+    "rating_annotation": 4,
+    "rating_metadata": 5,
+    "rating_ui": 4,
+    "rating_overall": 5,
+    "comment_good": "同期が速く、講師の説明と画面が完全に一致していて理解しやすい。用語パネルが非常に便利。",
+    "comment_bad": "ズーム時の操作性を改善してほしい。",
+    "comment_feature": "チェックリストのPDF出力機能があるとうれしい。",
+    "technical_issues": [
+      "zoom_issue"
+    ]
+  },
+  {
+    "id": "20532e69-9c13-490f-a9fd-ed9ee11312e7",
+    "timestamp": "2026-01-07T12:41:34.133556",
+    "room_id": "test_lecture_001",
+    "user_role": "instructor",
+    "user_name": "講師B",
+    "rating_sync_speed": 5,
+    "rating_annotation": 5,
+    "rating_metadata": 4,
+    "rating_ui": 5,
+    "rating_overall": 5,
+    "comment_good": "注釈ツールが直感的で、講義中に迷わず使える。受講者の反応も良い。",
+    "comment_bad": "重要ポイントカードをもっと多く登録したい。",
+    "comment_feature": "講義録画機能があれば復習に使える。",
+    "technical_issues": []
+  },
+  {
+    "id": "826d4a6e-b00b-4e73-9d00-a2857586461a",
+    "timestamp": "2026-01-07T12:41:39.625067",
+    "room_id": "test_lecture_001",
+    "user_role": "student",
+    "user_name": "受講者C",
+    "rating_sync_speed": 4,
+    "rating_annotation": 5,
+    "rating_metadata": 5,
+    "rating_ui": 4,
+    "rating_overall": 4,
+    "comment_good": "用語がその場で確認できるので復習がしやすい。",
+    "comment_bad": "モバイル対応を希望。",
+    "comment_feature": "ノート機能がほしい。",
+    "technical_issues": [
+      "mobile_issue"
+    ]
+  }
+]

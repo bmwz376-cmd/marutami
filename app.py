@@ -132,21 +132,23 @@ def handle_feedback():
     if request.method == "POST":
         # フィードバック送信
         data = request.json
+        ratings = data.get("ratings", {})
+        comments = data.get("comments", {})
         
         feedback = Feedback(
             id=str(uuid.uuid4()),
             timestamp=datetime.now().isoformat(),
             room_id=data.get("room_id", ""),
-            user_role=data.get("user_role"),
+            user_role=data.get("role", "student"),
             user_name=data.get("user_name", "匿名"),
-            rating_sync_speed=data.get("rating_sync_speed"),
-            rating_annotation=data.get("rating_annotation"),
-            rating_metadata=data.get("rating_metadata"),
-            rating_ui=data.get("rating_ui"),
-            rating_overall=data.get("rating_overall"),
-            comment_good=data.get("comment_good", ""),
-            comment_bad=data.get("comment_bad", ""),
-            comment_feature=data.get("comment_feature", ""),
+            rating_sync_speed=ratings.get("sync_speed", 3),
+            rating_annotation=ratings.get("annotation_clarity", 3),
+            rating_metadata=ratings.get("metadata_quality", 3),
+            rating_ui=ratings.get("ui_usability", 3),
+            rating_overall=ratings.get("overall", 3),
+            comment_good=comments.get("good_points", ""),
+            comment_bad=comments.get("improvements", ""),
+            comment_feature=comments.get("feature_requests", ""),
             technical_issues=data.get("technical_issues", [])
         )
         
@@ -163,6 +165,13 @@ def handle_feedback():
 @app.route("/api/feedback/statistics")
 def get_feedback_statistics():
     """フィードバック統計API"""
+    stats = feedback_manager.get_statistics()
+    return jsonify(stats)
+
+
+@app.route("/api/feedback/analytics")
+def get_feedback_analytics():
+    """フィードバック分析API（統計と同じ）"""
     stats = feedback_manager.get_statistics()
     return jsonify(stats)
 

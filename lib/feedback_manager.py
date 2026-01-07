@@ -82,11 +82,16 @@ class FeedbackManager:
         }
         
         for fb in feedbacks:
-            ratings["sync_speed"].append(fb["rating_sync_speed"])
-            ratings["annotation"].append(fb["rating_annotation"])
-            ratings["metadata"].append(fb["rating_metadata"])
-            ratings["ui"].append(fb["rating_ui"])
-            ratings["overall"].append(fb["rating_overall"])
+            if fb.get("rating_sync_speed") is not None:
+                ratings["sync_speed"].append(fb["rating_sync_speed"])
+            if fb.get("rating_annotation") is not None:
+                ratings["annotation"].append(fb["rating_annotation"])
+            if fb.get("rating_metadata") is not None:
+                ratings["metadata"].append(fb["rating_metadata"])
+            if fb.get("rating_ui") is not None:
+                ratings["ui"].append(fb["rating_ui"])
+            if fb.get("rating_overall") is not None:
+                ratings["overall"].append(fb["rating_overall"])
         
         avg_ratings = {
             key: sum(values) / len(values) if values else 0
