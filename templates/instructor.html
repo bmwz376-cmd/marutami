@@ -226,22 +226,43 @@
     
     // 初期化
     window.addEventListener('load', async () => {
-        console.log('初期化開始 - roomId:', roomId, 'materialId:', materialId);
-        
-        // 注釈レイヤーを初期化
-        annotationLayer = new AnnotationLayer('annotation-layer');
-        console.log('AnnotationLayer initialized:', annotationLayer);
-        
-        // 教材を読み込み
-        if (materialId && materialId !== 'None') {
-            console.log('教材読み込み:', materialId);
-            await viewer.loadMaterial(materialId);
-        } else {
-            console.warn('materialIdが設定されていません');
+        try {
+            console.log('=== 初期化開始 ===');
+            console.log('roomId:', roomId);
+            console.log('materialId:', materialId);
+            
+            // 注釈レイヤーを初期化
+            console.log('[1/4] AnnotationLayer初期化中...');
+            annotationLayer = new AnnotationLayer('annotation-layer');
+            console.log('✅ AnnotationLayer initialized:', annotationLayer);
+            
+            // 教材を読み込み
+            if (materialId && materialId !== 'None') {
+                console.log('[2/4] 教材読み込み中:', materialId);
+                await viewer.loadMaterial(materialId);
+                console.log('✅ 教材読み込み完了');
+            } else {
+                console.warn('⚠️ materialIdが設定されていません');
+            }
+            
+            // Sync初期化
+            console.log('[3/4] Sync初期化中...');
+            await sync.init(roomId, role);
+            console.log('✅ Sync初期化完了');
+            
+            // Instructor初期化
+            console.log('[4/4] Instructor初期化中...');
+            await instructor.init(roomId);
+            console.log('✅ Instructor初期化完了');
+            
+            console.log('=== 🎉 すべての初期化完了 ===');
+            
+        } catch (error) {
+            console.error('❌ 初期化エラー:', error);
+            console.error('エラー詳細:', error.message);
+            console.error('スタックトレース:', error.stack);
+            alert('初期化に失敗しました: ' + error.message);
         }
-        
-        await sync.init(roomId, role);
-        await instructor.init(roomId);
     });
 </script>
 
