@@ -1,0 +1,39 @@
+{
+  "name": "construction-training-platform",
+  "version": "1.0.0",
+  "description": "Web-based construction training material platform with real-time instructor synchronization",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "socket-server": "tsx socket-server.ts",
+    "convert-materials": "tsx scripts/convert-pdfs.ts"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "socket.io": "^4.7.0",
+    "socket.io-client": "^4.7.0",
+    "zustand": "^4.5.0",
+    "@tanstack/react-query": "^5.28.0",
+    "pdfjs-dist": "^4.0.379",
+    "canvas": "^2.11.2",
+    "sharp": "^0.33.0",
+    "nanoid": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8",
+    "autoprefixer": "^10.0.1",
+    "tsx": "^4.7.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.0"
+  }
+}
