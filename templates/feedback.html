@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}フィードバック送信 - 教材プラットフォーム{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold mb-6">講義フィードバック</h1>
+            
+            <p class="text-gray-600 mb-8">
+                テスト講義にご参加いただきありがとうございました。<br>
+                システムの改善のため、以下のフィードバックをお願いします。
+            </p>
+            
+            <form id="feedback-form" class="space-y-8">
+                <!-- 基本情報 -->
+                <div class="border-b pb-6">
+                    <h2 class="text-xl font-bold mb-4">基本情報</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">お名前（任意）</label>
+                            <input type="text" id="user_name" 
+                                class="w-full px-4 py-2 border rounded-lg"
+                                placeholder="山田太郎">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">役割 <span class="text-red-500">*</span></label>
+                            <select id="user_role" required
+                                class="w-full px-4 py-2 border rounded-lg">
+                                <option value="">選択してください</option>
+                                <option value="instructor">講師</option>
+                                <option value="student">受講者</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 評価（1-5） -->
+                <div class="border-b pb-6">
+                    <h2 class="text-xl font-bold mb-4">評価（1: 悪い 〜 5: 良い）</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">
+                                ページ同期の速度 <span class="text-red-500">*</span>
+                            </label>
+                            <div class="flex gap-2">
+                                <label v-for="i in [1,2,3,4,5]" class="rating-option">
+                                    <input type="radio" name="rating_sync_speed" :value="i" required>
+                                    <span>{{ i }}</span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">講師のページ操作が受講者に反映される速度</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">
+                                注釈ツール（ピン・レーザー等）の使いやすさ <span class="text-red-500">*</span>
+                            </label>
+                            <div class="flex gap-2">
+                                <label v-for="i in [1,2,3,4,5]" class="rating-option">
+                                    <input type="radio" name="rating_annotation" :value="i" required>
+                                    <span>{{ i }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">
+                                用語・チェックリストの有用性 <span class="text-red-500">*</span>
+                            </label>
+                            <div class="flex gap-2">
+                                <label v-for="i in [1,2,3,4,5]" class="rating-option">
+                                    <input type="radio" name="rating_metadata" :value="i" required>
+                                    <span>{{ i }}</span>
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">学習リソースとしての役立ち度</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">
+                                UI（画面デザイン・ボタン配置）の分かりやすさ <span class="text-red-500">*</span>
+                            </label>
+                            <div class="flex gap-2">
+                                <label v-for="i in [1,2,3,4,5]" class="rating-option">
+                                    <input type="radio" name="rating_ui" :value="i" required>
+                                    <span>{{ i }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">
+                                総合評価 <span class="text-red-500">*</span>
+                            </label>
+                            <div class="flex gap-2">
+                                <label v-for="i in [1,2,3,4,5]" class="rating-option">
+                                    <input type="radio" name="rating_overall" :value="i" required>
+                                    <span>{{ i }}</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 自由記述 -->
+                <div class="border-b pb-6">
+                    <h2 class="text-xl font-bold mb-4">ご意見・ご感想</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">良かった点</label>
+                            <textarea id="comment_good" rows="4"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                placeholder="使いやすかった機能、分かりやすかった点など"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">改善が必要な点</label>
+                            <textarea id="comment_bad" rows="4"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                placeholder="使いにくかった機能、分かりにくかった点など"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium mb-2">追加してほしい機能</label>
+                            <textarea id="comment_feature" rows="4"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                placeholder="こんな機能があれば便利、など"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 技術的問題 -->
+                <div class="border-b pb-6">
+                    <h2 class="text-xl font-bold mb-4">技術的問題（該当するものを選択）</h2>
+                    
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" value="ページ同期が遅い" class="technical-issue">
+                            <span>ページ同期が遅い（2秒以上）</span>
+                        </label>
+                        
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" value="画像が表示されない" class="technical-issue">
+                            <span>画像が表示されない</span>
+                        </label>
+                        
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" value="WebSocket切断" class="technical-issue">
+                            <span>WebSocketが頻繁に切断される</span>
+                        </label>
+                        
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" value="注釈が表示されない" class="technical-issue">
+                            <span>注釈（ピン等）が表示されない</span>
+                        </label>
+                        
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" value="用語が表示されない" class="technical-issue">
+                            <span>用語・チェックリストが表示されない</span>
+                        </label>
+                        
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" value="ズーム動作不良" class="technical-issue">
+                            <span>ズーム・パン操作が動作しない</span>
+                        </label>
+                        
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" value="キーボード操作不良" class="technical-issue">
+                            <span>キーボード操作が動作しない</span>
+                        </label>
+                        
+                        <label class="flex items-center gap-2">
+                            <input type="checkbox" value="その他" class="technical-issue">
+                            <span>その他の問題</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 送信ボタン -->
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 btn btn-primary py-4 text-lg">
+                        フィードバックを送信
+                    </button>
+                    <a href="/" class="btn btn-secondary py-4 px-8">
+                        キャンセル
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- 送信完了メッセージ -->
+        <div id="success-message" class="hidden mt-6 bg-green-50 border-l-4 border-green-400 p-4 rounded">
+            <p class="text-green-800 font-medium">
+                ✓ フィードバックを送信しました。ありがとうございました！
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const roomId = new URLSearchParams(window.location.search).get('room_id') || '';
+    
+    document.getElementById('feedback-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // 技術的問題の収集
+        const technicalIssues = Array.from(document.querySelectorAll('.technical-issue:checked'))
+            .map(cb => cb.value);
+        
+        const feedback = {
+            room_id: roomId,
+            user_role: document.getElementById('user_role').value,
+            user_name: document.getElementById('user_name').value || '匿名',
+            rating_sync_speed: parseInt(document.querySelector('input[name="rating_sync_speed"]:checked').value),
+            rating_annotation: parseInt(document.querySelector('input[name="rating_annotation"]:checked').value),
+            rating_metadata: parseInt(document.querySelector('input[name="rating_metadata"]:checked').value),
+            rating_ui: parseInt(document.querySelector('input[name="rating_ui"]:checked').value),
+            rating_overall: parseInt(document.querySelector('input[name="rating_overall"]:checked').value),
+            comment_good: document.getElementById('comment_good').value,
+            comment_bad: document.getElementById('comment_bad').value,
+            comment_feature: document.getElementById('comment_feature').value,
+            technical_issues: technicalIssues
+        };
+        
+        try {
+            const response = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(feedback)
+            });
+            
+            if (response.ok) {
+                document.getElementById('feedback-form').style.display = 'none';
+                document.getElementById('success-message').classList.remove('hidden');
+                
+                // 3秒後にホームへ
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+            } else {
+                alert('送信に失敗しました。もう一度お試しください。');
+            }
+        } catch (error) {
+            console.error('送信エラー:', error);
+            alert('送信に失敗しました: ' + error.message);
+        }
+    });
+</script>
+
+<style>
+    .rating-option {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border: 2px solid #d1d5db;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .rating-option:hover {
+        border-color: #3b82f6;
+        background: #eff6ff;
+    }
+    
+    .rating-option input {
+        display: none;
+    }
+    
+    .rating-option input:checked + span {
+        font-weight: bold;
+    }
+    
+    .rating-option:has(input:checked) {
+        border-color: #3b82f6;
+        background: #3b82f6;
+        color: white;
+    }
+</style>
+{% endblock %}

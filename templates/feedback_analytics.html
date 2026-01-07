@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}フィードバック集計 - 教材プラットフォーム{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">フィードバック集計</h1>
+                <p class="text-gray-600 mt-2">テスト講義のフィードバック分析</p>
+            </div>
+            <a href="/" class="btn btn-secondary">教材一覧へ</a>
+        </div>
+    </header>
+    
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- サマリーカード -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-sm font-medium text-gray-500">総フィードバック数</h3>
+                <p class="text-3xl font-bold mt-2" id="total-count">-</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-sm font-medium text-gray-500">講師</h3>
+                <p class="text-3xl font-bold mt-2" id="instructor-count">-</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-sm font-medium text-gray-500">受講者</h3>
+                <p class="text-3xl font-bold mt-2" id="student-count">-</p>
+            </div>
+        </div>
+        
+        <!-- 平均評価 -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6">平均評価（1-5）</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">ページ同期の速度</span>
+                        <span class="font-bold text-blue-600" id="avg-sync">-</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="bg-blue-600 h-3 rounded-full" id="bar-sync" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">注釈ツールの使いやすさ</span>
+                        <span class="font-bold text-green-600" id="avg-annotation">-</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="bg-green-600 h-3 rounded-full" id="bar-annotation" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">用語・チェックリストの有用性</span>
+                        <span class="font-bold text-purple-600" id="avg-metadata">-</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="bg-purple-600 h-3 rounded-full" id="bar-metadata" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium">UIの分かりやすさ</span>
+                        <span class="font-bold text-yellow-600" id="avg-ui">-</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="bg-yellow-600 h-3 rounded-full" id="bar-ui" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="font-medium text-lg">総合評価</span>
+                        <span class="font-bold text-red-600 text-lg" id="avg-overall">-</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4">
+                        <div class="bg-red-600 h-4 rounded-full" id="bar-overall" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- よくある問題 -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6">よくある技術的問題（Top 5）</h2>
+            
+            <div id="common-issues" class="space-y-3">
+                <p class="text-gray-500">データを読み込み中...</p>
+            </div>
+        </div>
+        
+        <!-- 個別フィードバック -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-6">個別フィードバック一覧</h2>
+            
+            <div id="feedback-list" class="space-y-4">
+                <p class="text-gray-500">データを読み込み中...</p>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadStatistics() {
+        try {
+            const response = await fetch('/api/feedback/statistics');
+            const stats = await response.json();
+            
+            // サマリー
+            document.getElementById('total-count').textContent = stats.total_count;
+            document.getElementById('instructor-count').textContent = stats.instructor_count;
+            document.getElementById('student-count').textContent = stats.student_count;
+            
+            // 平均評価
+            const ratings = stats.average_ratings;
+            
+            updateRating('sync', ratings.sync_speed);
+            updateRating('annotation', ratings.annotation);
+            updateRating('metadata', ratings.metadata);
+            updateRating('ui', ratings.ui);
+            updateRating('overall', ratings.overall);
+            
+            // よくある問題
+            const issuesEl = document.getElementById('common-issues');
+            if (stats.common_issues && stats.common_issues.length > 0) {
+                issuesEl.innerHTML = stats.common_issues.map(([issue, count]) => `
+                    <div class="flex items-center justify-between p-4 bg-red-50 rounded-lg">
+                        <span class="font-medium">${issue}</span>
+                        <span class="px-3 py-1 bg-red-600 text-white rounded-full text-sm">
+                            ${count}件
+                        </span>
+                    </div>
+                `).join('');
+            } else {
+                issuesEl.innerHTML = '<p class="text-gray-500">技術的問題の報告はありません</p>';
+            }
+            
+        } catch (error) {
+            console.error('統計読み込みエラー:', error);
+        }
+    }
+    
+    async function loadFeedbacks() {
+        try {
+            const response = await fetch('/api/feedback');
+            const feedbacks = await response.json();
+            
+            const listEl = document.getElementById('feedback-list');
+            
+            if (feedbacks.length === 0) {
+                listEl.innerHTML = '<p class="text-gray-500">フィードバックがまだありません</p>';
+                return;
+            }
+            
+            listEl.innerHTML = feedbacks.map(fb => `
+                <div class="border rounded-lg p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="font-bold text-lg">${fb.user_name}</span>
+                            <span class="ml-3 px-3 py-1 text-sm rounded-full ${
+                                fb.user_role === 'instructor' 
+                                    ? 'bg-blue-100 text-blue-800' 
+                                    : 'bg-green-100 text-green-800'
+                            }">
+                                ${fb.user_role === 'instructor' ? '講師' : '受講者'}
+                            </span>
+                        </div>
+                        <span class="text-sm text-gray-500">
+                            ${new Date(fb.timestamp).toLocaleString('ja-JP')}
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-5 gap-4 mb-4 text-center">
+                        <div>
+                            <div class="text-xs text-gray-500">同期速度</div>
+                            <div class="text-2xl font-bold">${fb.rating_sync_speed}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500">注釈</div>
+                            <div class="text-2xl font-bold">${fb.rating_annotation}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500">メタデータ</div>
+                            <div class="text-2xl font-bold">${fb.rating_metadata}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500">UI</div>
+                            <div class="text-2xl font-bold">${fb.rating_ui}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500 font-bold">総合</div>
+                            <div class="text-2xl font-bold text-red-600">${fb.rating_overall}</div>
+                        </div>
+                    </div>
+                    
+                    ${fb.comment_good ? `
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-green-700 mb-1">✓ 良かった点</div>
+                            <div class="text-sm text-gray-700 bg-green-50 p-3 rounded">${fb.comment_good}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${fb.comment_bad ? `
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-red-700 mb-1">✗ 改善が必要な点</div>
+                            <div class="text-sm text-gray-700 bg-red-50 p-3 rounded">${fb.comment_bad}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${fb.comment_feature ? `
+                        <div class="mb-3">
+                            <div class="text-sm font-medium text-blue-700 mb-1">💡 追加してほしい機能</div>
+                            <div class="text-sm text-gray-700 bg-blue-50 p-3 rounded">${fb.comment_feature}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${fb.technical_issues && fb.technical_issues.length > 0 ? `
+                        <div>
+                            <div class="text-sm font-medium text-orange-700 mb-1">⚠️ 技術的問題</div>
+                            <div class="flex flex-wrap gap-2">
+                                ${fb.technical_issues.map(issue => `
+                                    <span class="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded">${issue}</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+        } catch (error) {
+            console.error('フィードバック読み込みエラー:', error);
+        }
+    }
+    
+    function updateRating(key, value) {
+        const avgEl = document.getElementById(`avg-${key}`);
+        const barEl = document.getElementById(`bar-${key}`);
+        
+        avgEl.textContent = value.toFixed(2);
+        barEl.style.width = `${(value / 5) * 100}%`;
+    }
+    
+    // 初期読み込み
+    window.addEventListener('load', () => {
+        loadStatistics();
+        loadFeedbacks();
+    });
+    
+    // 30秒ごとに更新
+    setInterval(() => {
+        loadStatistics();
+        loadFeedbacks();
+    }, 30000);
+</script>
+{% endblock %}

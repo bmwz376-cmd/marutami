@@ -6,6 +6,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_cors import CORS
 import config
 from lib.room_manager import room_manager, Participant, Annotation
+from lib.feedback_manager import feedback_manager, Feedback
 from pathlib import Path
 import json
 import uuid
@@ -51,6 +52,18 @@ def student_view(room_id):
 def admin_view():
     """管理画面"""
     return render_template("admin.html")
+
+
+@app.route("/feedback")
+def feedback_view():
+    """フィードバックフォーム"""
+    return render_template("feedback.html")
+
+
+@app.route("/feedback/analytics")
+def feedback_analytics_view():
+    """フィードバック集計画面"""
+    return render_template("feedback_analytics.html")
 
 
 # ========================================
@@ -111,6 +124,47 @@ def get_all_rooms():
     """全ルーム一覧API"""
     rooms = room_manager.get_all_rooms()
     return jsonify({"rooms": rooms})
+
+
+@app.route("/api/feedback", methods=["GET", "POST"])
+def handle_feedback():
+    """フィードバックAPI"""
+    if request.method == "POST":
+        # フィードバック送信
+        data = request.json
+        
+        feedback = Feedback(
+            id=str(uuid.uuid4()),
+            timestamp=datetime.now().isoformat(),
+            room_id=data.get("room_id", ""),
+            user_role=data.get("user_role"),
+            user_name=data.get("user_name", "匿名"),
+            rating_sync_speed=data.get("rating_sync_speed"),
+            rating_annotation=data.get("rating_annotation"),
+            rating_metadata=data.get("rating_metadata"),
+            rating_ui=data.get("rating_ui"),
+            rating_overall=data.get("rating_overall"),
+            comment_good=data.get("comment_good", ""),
+            comment_bad=data.get("comment_bad", ""),
+            comment_feature=data.get("comment_feature", ""),
+            technical_issues=data.get("technical_issues", [])
+        )
+        
+        feedback_manager.add_feedback(feedback)
+        
+        return jsonify({"success": True, "id": feedback.id})
+    
+    else:
+        # フィードバック一覧取得
+        feedbacks = feedback_manager.get_all_feedbacks()
+        return jsonify(feedbacks)
+
+
+@app.route("/api/feedback/statistics")
+def get_feedback_statistics():
+    """フィードバック統計API"""
+    stats = feedback_manager.get_statistics()
+    return jsonify(stats)
 
 
 # ========================================
