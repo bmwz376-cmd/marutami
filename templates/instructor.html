@@ -205,6 +205,7 @@
 <script src="/static/js/instructor.js"></script>
 <script>
     const roomId = "{{ room_id }}";
+    const materialId = "{{ material_id }}";
     const role = "instructor";
     
     // タブ切替
@@ -225,9 +226,19 @@
     
     // 初期化
     window.addEventListener('load', async () => {
+        console.log('初期化開始 - roomId:', roomId, 'materialId:', materialId);
+        
         // 注釈レイヤーを初期化
         annotationLayer = new AnnotationLayer('annotation-layer');
         console.log('AnnotationLayer initialized:', annotationLayer);
+        
+        // 教材を読み込み
+        if (materialId && materialId !== 'None') {
+            console.log('教材読み込み:', materialId);
+            await viewer.loadMaterial(materialId);
+        } else {
+            console.warn('materialIdが設定されていません');
+        }
         
         await sync.init(roomId, role);
         await instructor.init(roomId);

@@ -39,13 +39,17 @@ def index():
 @app.route("/instructor/<room_id>")
 def instructor_view(room_id):
     """講師画面"""
-    return render_template("instructor.html", room_id=room_id)
+    room = room_manager.get_room(room_id)
+    material_id = room.material_id if room else None
+    return render_template("instructor.html", room_id=room_id, material_id=material_id)
 
 
 @app.route("/student/<room_id>")
 def student_view(room_id):
     """受講者画面"""
-    return render_template("student.html", room_id=room_id)
+    room = room_manager.get_room(room_id)
+    material_id = room.material_id if room else None
+    return render_template("student.html", room_id=room_id, material_id=material_id)
 
 
 @app.route("/test/annotations")

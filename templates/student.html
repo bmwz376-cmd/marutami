@@ -120,6 +120,7 @@
 <script src="/static/js/sync.js"></script>
 <script>
     const roomId = "{{ room_id }}";
+    const materialId = "{{ material_id }}";
     const role = "student";
     
     // タブ切替
@@ -169,6 +170,16 @@
     
     // 初期化
     window.addEventListener('load', async () => {
+        console.log('受講者画面初期化 - roomId:', roomId, 'materialId:', materialId);
+        
+        // 教材を読み込み
+        if (materialId && materialId !== 'None') {
+            console.log('教材読み込み:', materialId);
+            await viewer.loadMaterial(materialId);
+        } else {
+            console.warn('materialIdが設定されていません');
+        }
+        
         await sync.init(roomId, role, {
             onPageChange: (pageNumber) => {
                 const currentPage = viewer.materialData.pages.find(p => p.page_number === pageNumber);
