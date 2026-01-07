@@ -48,20 +48,35 @@ class InstructorController {
     setupAnnotationMode() {
         const pageContainer = document.getElementById('page-container');
         
+        if (!pageContainer) {
+            console.error('page-container が見つかりません');
+            return;
+        }
+        
         pageContainer.addEventListener('click', (e) => {
-            if (!this.annotationMode) return;
+            if (!this.annotationMode) {
+                console.log('注釈モードが設定されていません');
+                return;
+            }
             
             const rect = pageContainer.getBoundingClientRect();
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
             
+            console.log(`クリック位置: (${x.toFixed(2)}%, ${y.toFixed(2)}%), モード: ${this.annotationMode}`);
+            
             if (this.annotationMode === 'pin') {
                 this.addPin(x, y);
             } else if (this.annotationMode === 'laser') {
                 this.addLaser(x, y);
+            } else if (this.annotationMode === 'circle') {
+                this.addCircle(x, y);
+            } else if (this.annotationMode === 'rect') {
+                this.addRect(x, y);
             }
-            // TODO: 他の注釈タイプ実装
         });
+        
+        console.log('注釈モードのクリックイベントを設定しました');
     }
     
     addPin(x, y) {
@@ -74,6 +89,16 @@ class InstructorController {
             temporary: false
         };
         
+        console.log('ピンを追加:', annotation);
+        
+        // ローカル表示
+        if (typeof annotationLayer !== 'undefined') {
+            annotationLayer.addAnnotation(annotation);
+        } else {
+            console.error('annotationLayer が定義されていません');
+        }
+        
+        // 同期送信
         this.annotations.push(annotation);
         sync.sendAnnotation(annotation);
     }
@@ -88,17 +113,77 @@ class InstructorController {
             temporary: true
         };
         
+        console.log('レーザーポインタを追加:', annotation);
+        
+        // ローカル表示
+        if (typeof annotationLayer !== 'undefined') {
+            annotationLayer.addAnnotation(annotation);
+        } else {
+            console.error('annotationLayer が定義されていません');
+        }
+        
+        // 同期送信
         sync.sendAnnotation(annotation);
         
         // 3秒後に自動削除
         setTimeout(() => {
+            if (typeof annotationLayer !== 'undefined') {
+                annotationLayer.removeAnnotation(annotation.id);
+            }
             sync.sendAnnotationRemove(annotation.id);
+            console.log('レーザーポインタを自動削除:', annotation.id);
         }, 3000);
+    }
+    
+    addCircle(x, y) {
+        const annotation = {
+            id: this.generateId(),
+            page_number: viewer.currentPage,
+            type: 'circle',
+            data: {x, y, radius: 50, color: 'blue'},
+            timestamp: new Date().toISOString(),
+            temporary: false
+        };
+        
+        console.log('円を追加:', annotation);
+        
+        if (typeof annotationLayer !== 'undefined') {
+            annotationLayer.addAnnotation(annotation);
+        }
+        
+        this.annotations.push(annotation);
+        sync.sendAnnotation(annotation);
+    }
+    
+    addRect(x, y) {
+        const annotation = {
+            id: this.generateId(),
+            page_number: viewer.currentPage,
+            type: 'rect',
+            data: {x, y, width: 100, height: 80, color: 'green'},
+            timestamp: new Date().toISOString(),
+            temporary: false
+        };
+        
+        console.log('四角を追加:', annotation);
+        
+        if (typeof annotationLayer !== 'undefined') {
+            annotationLayer.addAnnotation(annotation);
+        }
+        
+        this.annotations.push(annotation);
+        sync.sendAnnotation(annotation);
     }
     
     clearAnnotations() {
         if (confirm('すべての注釈をクリアしますか？')) {
+            console.log('注釈をクリアします');
             this.annotations = [];
+            
+            if (typeof annotationLayer !== 'undefined') {
+                annotationLayer.clear();
+            }
+            
             sync.sendAnnotationClear();
         }
     }

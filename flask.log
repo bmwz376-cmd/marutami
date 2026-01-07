@@ -1,0 +1,23 @@
+=== 教材プラットフォーム起動 ===
+教材ディレクトリ: /home/user/webapp/static/materials
+URL: http://localhost:5000
+
+Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://169.254.0.21:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+=== 教材プラットフォーム起動 ===
+教材ディレクトリ: /home/user/webapp/static/materials
+URL: http://localhost:5000
+
+Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+ * Debugger is active!
+ * Debugger PIN: 122-972-965
+127.0.0.1 - - [07/Jan/2026 13:22:04] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jan/2026 13:22:09] "GET /api/materials/⑧鉄筋工事１ HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jan/2026 13:22:09] "POST /api/rooms HTTP/1.1" 200 -
