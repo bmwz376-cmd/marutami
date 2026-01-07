@@ -1,0 +1,62 @@
+
+> construction-training-platform@1.0.0 convert-materials
+> tsx scripts/convert-pdfs.ts
+
+🚀 Starting PDF material conversion...
+
+✓ Database initialized
+
+Found 9 PDF files in /home/user/uploaded_files
+
+📄 Processing: ③仮設工事
+   Category: temporary
+   File: ③仮設工事.pdf
+   ✗ Error: Error: Setting up fake worker failed: "Cannot find package 'null' imported from /home/user/webapp/node_modules/pdfjs-dist/legacy/build/pdf.mjs".
+
+📄 Processing: ⑤杭工事
+   Category: pile
+   File: ⑤杭工事.pdf
+   ✗ Error: Error: Setting up fake worker failed: "Cannot find package 'null' imported from /home/user/webapp/node_modules/pdfjs-dist/legacy/build/pdf.mjs".
+
+📄 Processing: ⑥掘削工事・山留支保工工事
+   Category: excavation
+   File: ⑥掘削工事・山留支保工工事.pdf
+   ✗ Error: Error: Setting up fake worker failed: "Cannot find package 'null' imported from /home/user/webapp/node_modules/pdfjs-dist/legacy/build/pdf.mjs".
+
+📄 Processing: ⑦躯体工事の流れと型枠工事
+   Category: framework
+   File: ⑦躯体工事の流れと型枠工事.pdf
+   ✗ Error: Error: Setting up fake worker failed: "Cannot find package 'null' imported from /home/user/webapp/node_modules/pdfjs-dist/legacy/build/pdf.mjs".
+
+📄 Processing: ⑧鉄筋工事１
+   Category: rebar
+   File: ⑧鉄筋工事１.pdf
+   ✗ Error: Error: Setting up fake worker failed: "Cannot find package 'null' imported from /home/user/webapp/node_modules/pdfjs-dist/legacy/build/pdf.mjs".
+
+📄 Processing: ⑨鉄筋工事２
+   Category: rebar
+   File: ⑨鉄筋工事２.pdf
+   ✗ Error: Error: Setting up fake worker failed: "Cannot find package 'null' imported from /home/user/webapp/node_modules/pdfjs-dist/legacy/build/pdf.mjs".
+
+📄 Processing: ⑩コンクリート工事１
+   Category: concrete
+   File: ⑩コンクリート工事１.pdf
+   ✗ Error: Error: Setting up fake worker failed: "Cannot find package 'null' imported from /home/user/webapp/node_modules/pdfjs-dist/legacy/build/pdf.mjs".
+
+📄 Processing: ⑪コンクリート工事２
+   Category: concrete
+   File: ⑪コンクリート工事２改.pdf
+   ✗ Error: Error: Setting up fake worker failed: "Cannot find package 'null' imported from /home/user/webapp/node_modules/pdfjs-dist/legacy/build/pdf.mjs".
+
+📄 Processing: ④山留工事
+   Category: retention
+   File: ⓸山留工事.pdf
+   ✗ Error: Error: Setting up fake worker failed: "Cannot find package 'null' imported from /home/user/webapp/node_modules/pdfjs-dist/legacy/build/pdf.mjs".
+
+🎉 All materials processed successfully!
+
+Next steps:
+1. Run: npm run dev
+2. Visit: http://localhost:3000/materials
+3. Create a lecture room and start teaching!
+

@@ -1,0 +1,59 @@
+{
+  "version": "1.0",
+  "materials": [
+    {
+      "id": "③仮設工事",
+      "title": "③仮設工事",
+      "category": "temporary",
+      "total_pages": 16
+    },
+    {
+      "id": "⑦躯体工事の流れと型枠工事",
+      "title": "⑦躯体工事の流れと型枠工事",
+      "category": "framework",
+      "total_pages": 23
+    },
+    {
+      "id": "⑧鉄筋工事１",
+      "title": "⑧鉄筋工事１",
+      "category": "rebar",
+      "total_pages": 18
+    },
+    {
+      "id": "⑥掘削工事・山留支保工工事",
+      "title": "⑥掘削工事・山留支保工工事",
+      "category": "retaining",
+      "total_pages": 18
+    },
+    {
+      "id": "⓸山留工事",
+      "title": "⓸山留工事",
+      "category": "retaining",
+      "total_pages": 20
+    },
+    {
+      "id": "⑤杭工事",
+      "title": "⑤杭工事",
+      "category": "pile",
+      "total_pages": 18
+    },
+    {
+      "id": "⑨鉄筋工事２",
+      "title": "⑨鉄筋工事２",
+      "category": "rebar",
+      "total_pages": 18
+    },
+    {
+      "id": "⑩コンクリート工事１",
+      "title": "⑩コンクリート工事１",
+      "category": "concrete",
+      "total_pages": 19
+    },
+    {
+      "id": "⑪コンクリート工事２改",
+      "title": "⑪コンクリート工事２改",
+      "category": "concrete",
+      "total_pages": 17
+    }
+  ]
+}

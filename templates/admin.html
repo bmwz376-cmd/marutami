@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}管理画面 - 教材プラットフォーム{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">管理画面</h1>
+                <p class="text-gray-600 mt-2">教材アップロード・変換</p>
+            </div>
+            <a href="/" class="btn btn-secondary">教材一覧へ</a>
+        </div>
+    </header>
+    
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4">PDFアップロード</h2>
+            
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                
+                <div class="mt-4">
+                    <label for="file-upload" class="btn btn-primary cursor-pointer">
+                        ファイルを選択
+                        <input id="file-upload" name="file-upload" type="file" class="sr-only" accept=".pdf" multiple>
+                    </label>
+                    <p class="text-sm text-gray-500 mt-2">またはここにドラッグ&ドロップ</p>
+                </div>
+                
+                <p class="text-xs text-gray-500 mt-4">PDF形式のみ対応</p>
+            </div>
+            
+            <div id="upload-queue" class="mt-6 space-y-3">
+                <!-- アップロード進捗 -->
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-bold mb-4">変換済み教材</h2>
+            
+            <div id="materials-list" class="space-y-2">
+                <p class="text-gray-500">読み込み中...</p>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // ファイルアップロード処理（簡易実装）
+    const fileInput = document.getElementById('file-upload');
+    const uploadQueue = document.getElementById('upload-queue');
+    
+    fileInput.addEventListener('change', handleFiles);
+    
+    function handleFiles(e) {
+        const files = Array.from(e.target.files);
+        
+        files.forEach(file => {
+            if (file.type !== 'application/pdf') {
+                alert(`${file.name} はPDFファイルではありません`);
+                return;
+            }
+            
+            uploadFile(file);
+        });
+    }
+    
+    async function uploadFile(file) {
+        const item = document.createElement('div');
+        item.className = 'bg-gray-50 p-4 rounded-lg';
+        item.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex-1">
+                    <p class="font-medium">${file.name}</p>
+                    <p class="text-sm text-gray-500">アップロード中...</p>
+                </div>
+                <div class="text-blue-600">
+                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+            </div>
+        `;
+        uploadQueue.appendChild(item);
+        
+        // FormData作成
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        try {
+            // TODO: 実装 - サーバーへアップロード
+            // const response = await fetch('/api/upload', {
+            //     method: 'POST',
+            //     body: formData
+            // });
+            
+            // 仮の成功処理
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            item.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="font-medium">${file.name}</p>
+                        <p class="text-sm text-green-600">アップロード完了</p>
+                    </div>
+                    <div class="text-green-600">
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+            
+            // 教材リスト更新
+            loadMaterials();
+            
+        } catch (error) {
+            item.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="font-medium">${file.name}</p>
+                        <p class="text-sm text-red-600">エラー: ${error.message}</p>
+                    </div>
+                    <div class="text-red-600">
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+        }
+    }
+    
+    // 教材リスト読み込み
+    async function loadMaterials() {
+        try {
+            const response = await fetch('/api/materials');
+            const data = await response.json();
+            
+            const list = document.getElementById('materials-list');
+            
+            if (data.materials.length === 0) {
+                list.innerHTML = '<p class="text-gray-500">教材がありません</p>';
+                return;
+            }
+            
+            list.innerHTML = data.materials.map(m => `
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="font-medium">${m.title}</p>
+                        <p class="text-sm text-gray-500">${m.total_pages}ページ • ${m.category}</p>
+                    </div>
+                    <button onclick="deleteMaterial('${m.id}')" class="btn btn-danger btn-sm">
+                        削除
+                    </button>
+                </div>
+            `).join('');
+            
+        } catch (error) {
+            console.error('教材読み込みエラー:', error);
+        }
+    }
+    
+    function deleteMaterial(id) {
+        if (confirm('この教材を削除しますか？')) {
+            alert('削除機能は未実装です');
+        }
+    }
+    
+    // 初期読み込み
+    loadMaterials();
+</script>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}講師モード - 教材プラットフォーム{% endblock %}
+
+{% block content %}
+<div class="viewer-container">
+    <!-- 左サイドバー: サムネイル -->
+    <div class="sidebar">
+        <div class="p-4 bg-white border-b">
+            <h2 class="font-bold text-lg" id="material-title">読み込み中...</h2>
+            <p class="text-sm text-gray-600"><span id="total-pages">0</span>ページ</p>
+        </div>
+        
+        <div id="thumbnails-container" class="p-4 space-y-2">
+            <!-- サムネイル動的生成 -->
+        </div>
+    </div>
+    
+    <!-- 中央: ページ表示 -->
+    <div class="main-viewer">
+        <!-- ツールバー -->
+        <div class="toolbar">
+            <div class="sync-indicator active" id="sync-indicator">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="5"/>
+                </svg>
+                <span>同期中</span>
+            </div>
+            
+            <div class="flex-1"></div>
+            
+            <button class="btn btn-secondary" onclick="viewer.zoomOut()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/>
+                </svg>
+            </button>
+            
+            <span id="zoom-level">100%</span>
+            
+            <button class="btn btn-secondary" onclick="viewer.zoomIn()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                </svg>
+            </button>
+            
+            <button class="btn btn-secondary" onclick="viewer.fitToScreen()">
+                画面に合わせる
+            </button>
+            
+            <div class="flex-1"></div>
+            
+            <button class="btn btn-secondary" onclick="viewer.prevPage()" id="prev-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            
+            <span class="font-medium">
+                <span id="current-page">1</span> / <span id="total-pages-display">1</span>
+            </span>
+            
+            <button class="btn btn-secondary" onclick="viewer.nextPage()" id="next-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- ページ表示エリア -->
+        <div class="page-canvas-container" id="page-container">
+            <img id="page-image" class="page-image" alt="ページ画像">
+            <svg id="annotation-layer" class="annotation-layer"></svg>
+        </div>
+    </div>
+    
+    <!-- 右パネル: 講師ツール -->
+    <div class="right-panel">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-4">講師ツール</h2>
+            
+            <!-- タブ -->
+            <div class="flex border-b mb-4">
+                <button class="tab-btn active" data-tab="control">制御</button>
+                <button class="tab-btn" data-tab="annotation">注釈</button>
+                <button class="tab-btn" data-tab="notes">ノート</button>
+                <button class="tab-btn" data-tab="points">重要ポイント</button>
+            </div>
+            
+            <!-- 制御タブ -->
+            <div class="tab-content active" id="tab-control">
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="font-bold mb-2">同期制御</h3>
+                        <button id="sync-toggle-btn" onclick="instructor.toggleSync()" 
+                            class="w-full btn btn-primary">
+                            同期を停止
+                        </button>
+                        <p class="text-sm text-gray-600 mt-2">
+                            ONの間、受講者は講師と同じページを表示します
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-bold mb-2">参加者 (<span id="participant-count">0</span>人)</h3>
+                        <div id="participants-list" class="space-y-2 text-sm">
+                            <!-- 動的生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 注釈タブ -->
+            <div class="tab-content" id="tab-annotation">
+                <div class="space-y-3">
+                    <button onclick="instructor.setAnnotationMode('pin')" 
+                        class="w-full btn btn-primary annotation-mode-btn" data-mode="pin">
+                        📍 ピン
+                    </button>
+                    
+                    <button onclick="instructor.setAnnotationMode('circle')" 
+                        class="w-full btn btn-secondary annotation-mode-btn" data-mode="circle">
+                        ⭕ 丸
+                    </button>
+                    
+                    <button onclick="instructor.setAnnotationMode('rect')" 
+                        class="w-full btn btn-secondary annotation-mode-btn" data-mode="rect">
+                        ▭ 四角
+                    </button>
+                    
+                    <button onclick="instructor.setAnnotationMode('pen')" 
+                        class="w-full btn btn-secondary annotation-mode-btn" data-mode="pen">
+                        ✏️ ペン
+                    </button>
+                    
+                    <button onclick="instructor.setAnnotationMode('laser')" 
+                        class="w-full btn btn-secondary annotation-mode-btn" data-mode="laser">
+                        🔴 レーザーポインタ
+                    </button>
+                    
+                    <hr>
+                    
+                    <button onclick="instructor.clearAnnotations()" 
+                        class="w-full btn btn-danger">
+                        注釈をクリア
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ノートタブ -->
+            <div class="tab-content" id="tab-notes">
+                <div id="instructor-notes-content">
+                    <p class="text-gray-500 text-sm">このページにはノートがありません</p>
+                </div>
+            </div>
+            
+            <!-- 重要ポイントタブ -->
+            <div class="tab-content" id="tab-points">
+                <div class="space-y-3">
+                    <button onclick="instructor.showImportantCard('配筋検査の要点', ['構造図の把握', '定着・重ね継手の確認', 'かぶりの確認', '帯筋・あばら筋の配置', '鉄筋の清掃状態'])" 
+                        class="w-full btn btn-primary text-left">
+                        配筋検査の要点
+                    </button>
+                    
+                    <button onclick="instructor.showImportantCard('コンクリート打設確認', ['配合計画の確認', '荷卸し時の検査', 'スランプ試験', '打設速度の管理', '締固めの確認'])" 
+                        class="w-full btn btn-primary text-left">
+                        コンクリート打設確認
+                    </button>
+                    
+                    <button onclick="instructor.showImportantCard('養生管理', ['初期養生期間', '温度管理', '湿潤養生の方法', '型枠存置期間', '強度確認'])" 
+                        class="w-full btn btn-primary text-left">
+                        養生管理
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 重要ポイントカードモーダル -->
+<div id="important-modal" class="modal">
+    <div class="modal-content">
+        <h2 class="text-2xl font-bold mb-4" id="important-title"></h2>
+        <ul class="space-y-3" id="important-points">
+            <!-- 動的生成 -->
+        </ul>
+        <button onclick="instructor.hideImportantCard()" class="mt-6 w-full btn btn-primary">
+            次へ
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/viewer.js"></script>
+<script src="/static/js/sync.js"></script>
+<script src="/static/js/instructor.js"></script>
+<script>
+    const roomId = "{{ room_id }}";
+    const role = "instructor";
+    
+    // タブ切替
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        });
+    });
+    
+    // 初期化
+    window.addEventListener('load', async () => {
+        await sync.init(roomId, role);
+        await instructor.init(roomId);
+    });
+</script>
+
+<style>
+    .tab-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .tab-btn.active {
+        border-bottom: 3px solid #007bff;
+        color: #007bff;
+        font-weight: 600;
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    .annotation-mode-btn.active {
+        background: #0056b3;
+    }
+</style>
+{% endblock %}

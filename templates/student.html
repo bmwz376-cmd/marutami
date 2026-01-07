@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}受講者モード - 教材プラットフォーム{% endblock %}
+
+{% block content %}
+<div class="viewer-container">
+    <!-- 左サイドバー: サムネイル -->
+    <div class="sidebar">
+        <div class="p-4 bg-white border-b">
+            <h2 class="font-bold text-lg" id="material-title">読み込み中...</h2>
+            <p class="text-sm text-gray-600"><span id="total-pages">0</span>ページ</p>
+        </div>
+        
+        <div id="thumbnails-container" class="p-4 space-y-2">
+            <!-- サムネイル動的生成 -->
+        </div>
+    </div>
+    
+    <!-- 中央: ページ表示 -->
+    <div class="main-viewer">
+        <!-- ツールバー -->
+        <div class="toolbar">
+            <div class="sync-indicator active" id="sync-indicator">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="5"/>
+                </svg>
+                <span>講師と同期中</span>
+            </div>
+            
+            <div class="flex-1"></div>
+            
+            <button class="btn btn-secondary" onclick="viewer.zoomOut()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"/>
+                </svg>
+            </button>
+            
+            <span id="zoom-level">100%</span>
+            
+            <button class="btn btn-secondary" onclick="viewer.zoomIn()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                </svg>
+            </button>
+            
+            <button class="btn btn-secondary" onclick="viewer.fitToScreen()">
+                画面に合わせる
+            </button>
+            
+            <div class="flex-1"></div>
+            
+            <span class="font-medium">
+                <span id="current-page">1</span> / <span id="total-pages-display">1</span>
+            </span>
+        </div>
+        
+        <!-- ページ表示エリア -->
+        <div class="page-canvas-container" id="page-container">
+            <img id="page-image" class="page-image" alt="ページ画像">
+            <svg id="annotation-layer" class="annotation-layer"></svg>
+        </div>
+    </div>
+    
+    <!-- 右パネル: 学習リソース -->
+    <div class="right-panel">
+        <div class="p-4">
+            <h2 class="text-xl font-bold mb-4">学習リソース</h2>
+            
+            <!-- タブ -->
+            <div class="flex border-b mb-4">
+                <button class="tab-btn active" data-tab="glossary">用語</button>
+                <button class="tab-btn" data-tab="checklist">チェックリスト</button>
+                <button class="tab-btn" data-tab="notes">ノート</button>
+            </div>
+            
+            <!-- 用語タブ -->
+            <div class="tab-content active" id="tab-glossary">
+                <div id="glossary-content">
+                    <p class="text-gray-500 text-sm">このページには用語がありません</p>
+                </div>
+            </div>
+            
+            <!-- チェックリストタブ -->
+            <div class="tab-content" id="tab-checklist">
+                <div id="checklist-content">
+                    <p class="text-gray-500 text-sm">このページにはチェックリストがありません</p>
+                </div>
+            </div>
+            
+            <!-- ノートタブ -->
+            <div class="tab-content" id="tab-notes">
+                <div id="notes-content">
+                    <p class="text-gray-500 text-sm">講師がノートを公開していません</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 重要ポイントカードモーダル -->
+<div id="important-modal" class="modal">
+    <div class="modal-content">
+        <h2 class="text-2xl font-bold mb-4" id="important-title"></h2>
+        <ul class="space-y-3" id="important-points">
+            <!-- 動的生成 -->
+        </ul>
+        <p class="text-sm text-gray-500 mt-6 text-center">
+            講師が次のページに進むまでお待ちください
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/viewer.js"></script>
+<script src="/static/js/sync.js"></script>
+<script>
+    const roomId = "{{ room_id }}";
+    const role = "student";
+    
+    // タブ切替
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+            
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        });
+    });
+    
+    // 受講者用のページメタデータ表示
+    function updatePageMetadata(pageData) {
+        // 用語
+        const glossaryEl = document.getElementById('glossary-content');
+        if (pageData.glossary && pageData.glossary.length > 0) {
+            glossaryEl.innerHTML = pageData.glossary.map(term => `
+                <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                    <h4 class="font-bold text-blue-600">${term.term}</h4>
+                    <p class="text-sm text-gray-700 mt-1">${term.definition}</p>
+                </div>
+            `).join('');
+        } else {
+            glossaryEl.innerHTML = '<p class="text-gray-500 text-sm">このページには用語がありません</p>';
+        }
+        
+        // チェックリスト
+        const checklistEl = document.getElementById('checklist-content');
+        if (pageData.checklist && pageData.checklist.length > 0) {
+            checklistEl.innerHTML = pageData.checklist.map((item, idx) => `
+                <div class="mb-3">
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="checkbox" class="mt-1" data-idx="${idx}">
+                        <span class="text-sm">${item.text}</span>
+                    </label>
+                    ${item.note ? `<p class="text-xs text-red-600 ml-6 mt-1">${item.note}</p>` : ''}
+                </div>
+            `).join('');
+        } else {
+            checklistEl.innerHTML = '<p class="text-gray-500 text-sm">このページにはチェックリストがありません</p>';
+        }
+    }
+    
+    // 初期化
+    window.addEventListener('load', async () => {
+        await sync.init(roomId, role, {
+            onPageChange: (pageNumber) => {
+                const currentPage = viewer.materialData.pages.find(p => p.page_number === pageNumber);
+                if (currentPage) {
+                    updatePageMetadata(currentPage);
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .tab-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .tab-btn.active {
+        border-bottom: 3px solid #007bff;
+        color: #007bff;
+        font-weight: 600;
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+</style>
+{% endblock %}
