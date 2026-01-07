@@ -48,6 +48,12 @@ def student_view(room_id):
     return render_template("student.html", room_id=room_id)
 
 
+@app.route("/test/annotations")
+def test_annotations():
+    """注釈機能テストページ"""
+    return render_template("test_annotations.html")
+
+
 @app.route("/admin")
 def admin_view():
     """管理画面"""

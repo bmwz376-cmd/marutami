@@ -50,5 +50,21 @@
     "technical_issues": [
       "mobile_issue"
     ]
+  },
+  {
+    "id": "1292b211-5fb5-4163-ae96-2afd24516cd7",
+    "timestamp": "2026-01-07T12:55:52.197583",
+    "room_id": "78d0a626",
+    "user_role": "student",
+    "user_name": "テスト受講者",
+    "rating_sync_speed": 5,
+    "rating_annotation": 5,
+    "rating_metadata": 5,
+    "rating_ui": 5,
+    "rating_overall": 5,
+    "comment_good": "全機能が完璧に動作しています。",
+    "comment_bad": "特になし",
+    "comment_feature": "このまま継続してください",
+    "technical_issues": []
   }
 ]

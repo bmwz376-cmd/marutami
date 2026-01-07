@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注釈機能テストページ</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .controls {
+            width: 300px;
+            border: 2px solid #007bff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .controls button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #f0f0f0;
+            transition: all 0.2s;
+        }
+        .controls button:hover {
+            background: #e0e0e0;
+        }
+        .controls button.active {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        .canvas-area {
+            flex: 1;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            position: relative;
+            background: #f9f9f9;
+            min-height: 600px;
+            cursor: crosshair;
+        }
+        .annotation {
+            position: absolute;
+            pointer-events: none;
+        }
+        .pin {
+            width: 20px;
+            height: 20px;
+            background: red;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .laser {
+            width: 30px;
+            height: 30px;
+            background: yellow;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .modal-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        .modal-content li {
+            padding: 10px;
+            margin: 10px 0;
+            background: #f0f7ff;
+            border-left: 4px solid #007bff;
+        }
+        .status {
+            padding: 15px;
+            background: #e7f3ff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>📍 注釈機能テストページ</h1>
+    
+    <div class="status">
+        <strong>現在のモード:</strong> <span id="current-mode">なし</span><br>
+        <strong>注釈数:</strong> <span id="annotation-count">0</span>個
+    </div>
+    
+    <div class="test-container">
+        <div class="controls">
+            <h2>注釈ツール</h2>
+            <button id="btn-pin" onclick="setMode('pin')">📍 ピン</button>
+            <button id="btn-laser" onclick="setMode('laser')">🔴 レーザーポインタ</button>
+            <button onclick="setMode(null)" style="background: #dc3545; color: white;">❌ モード解除</button>
+            <hr>
+            <button onclick="clearAnnotations()" style="background: #ffc107;">🗑️ 全クリア</button>
+            
+            <h2 style="margin-top: 30px;">重要ポイント</h2>
+            <button onclick="showCard('配筋検査の要点', ['構造図の把握', '定着・重ね継手の確認', 'かぶりの確認'])">
+                配筋検査の要点
+            </button>
+            <button onclick="showCard('コンクリート打設', ['配合計画の確認', 'スランプ試験', '締固めの確認'])">
+                コンクリート打設
+            </button>
+            
+            <h2 style="margin-top: 30px;">使い方</h2>
+            <ol style="font-size: 14px; padding-left: 20px;">
+                <li>ツールボタンをクリック</li>
+                <li>右側の灰色エリアをクリック</li>
+                <li>注釈が表示される</li>
+            </ol>
+        </div>
+        
+        <div class="canvas-area" id="canvas" onclick="handleClick(event)">
+            <div style="text-align: center; padding-top: 250px; color: #999;">
+                <h2>ここをクリックして注釈を追加</h2>
+                <p>まず左側でツールを選んでから、ここをクリックしてください</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="log" id="log">
+        <strong>操作ログ:</strong>
+    </div>
+    
+    <!-- モーダル -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title"></h2>
+            <ul id="modal-points"></ul>
+            <button onclick="hideCard()" style="width: 100%; padding: 15px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">
+                閉じる
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        let currentMode = null;
+        let annotationCount = 0;
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('current-mode').textContent = mode || 'なし';
+            
+            // ボタンのハイライト
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (mode) {
+                document.getElementById(`btn-${mode}`).classList.add('active');
+                log(`注釈モードを「${mode}」に設定しました`);
+            } else {
+                log('注釈モードを解除しました');
+            }
+        }
+        
+        function handleClick(event) {
+            if (!currentMode) {
+                alert('まず左側で注釈ツールを選んでください！');
+                log('エラー: モードが選択されていません');
+                return;
+            }
+            
+            const canvas = document.getElementById('canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            if (currentMode === 'pin') {
+                addPin(x, y);
+            } else if (currentMode === 'laser') {
+                addLaser(x, y);
+            }
+        }
+        
+        function addPin(x, y) {
+            const canvas = document.getElementById('canvas');
+            const pin = document.createElement('div');
+            pin.className = 'annotation pin';
+            pin.style.left = (x - 10) + 'px';
+            pin.style.top = (y - 10) + 'px';
+            canvas.appendChild(pin);
+            
+            annotationCount++;
+            document.getElementById('annotation-count').textContent = annotationCount;
+            log(`ピンを追加しました (${Math.round(x)}, ${Math.round(y)})`);
+        }
+        
+        function addLaser(x, y) {
+            const canvas = document.getElementById('canvas');
+            const laser = document.createElement('div');
+            laser.className = 'annotation laser';
+            laser.style.left = (x - 15) + 'px';
+            laser.style.top = (y - 15) + 'px';
+            canvas.appendChild(laser);
+            
+            log(`レーザーポインタを表示しました (3秒後に自動消去)`);
+            
+            // 3秒後に削除
+            setTimeout(() => {
+                canvas.removeChild(laser);
+                log('レーザーポインタを自動削除しました');
+            }, 3000);
+        }
+        
+        function clearAnnotations() {
+            const canvas = document.getElementById('canvas');
+            const annotations = canvas.querySelectorAll('.annotation');
+            annotations.forEach(ann => canvas.removeChild(ann));
+            
+            annotationCount = 0;
+            document.getElementById('annotation-count').textContent = annotationCount;
+            log('全ての注釈をクリアしました');
+        }
+        
+        function showCard(title, points) {
+            const modal = document.getElementById('modal');
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-points').innerHTML = points.map(p => 
+                `<li>• ${p}</li>`
+            ).join('');
+            modal.classList.add('show');
+            log(`重要ポイントカード「${title}」を表示しました`);
+        }
+        
+        function hideCard() {
+            document.getElementById('modal').classList.remove('show');
+            log('重要ポイントカードを閉じました');
+        }
+        
+        // 初期化
+        log('テストページを読み込みました');
+        log('左側でツールを選び、右側のグレーエリアをクリックしてください');
+    </script>
+</body>
+</html>
