@@ -40,6 +40,15 @@ def index():
 def instructor_view(room_id):
     """講師画面"""
     room = room_manager.get_room(room_id)
+    
+    # ルームが存在しない場合はデフォルト教材で作成
+    if not room:
+        print(f"ルーム {room_id} が存在しないため、デフォルト教材で作成します")
+        default_material_id = "⑧鉄筋工事１"
+        instructor_id = "default_instructor"
+        room = room_manager.create_room(room_id, default_material_id, instructor_id)
+        print(f"ルーム作成完了: {room_id}, 教材: {default_material_id}")
+    
     material_id = room.material_id if room else None
     return render_template("instructor.html", room_id=room_id, material_id=material_id)
 
@@ -48,6 +57,11 @@ def instructor_view(room_id):
 def student_view(room_id):
     """受講者画面"""
     room = room_manager.get_room(room_id)
+    
+    # ルームが存在しない場合はエラー（受講者は講師がルームを作成してから入室すべき）
+    if not room:
+        return "このルームは存在しません。講師にルームURLを確認してください。", 404
+    
     material_id = room.material_id if room else None
     return render_template("student.html", room_id=room_id, material_id=material_id)
 
@@ -62,6 +76,15 @@ def test_annotations():
 def debug_instructor(room_id):
     """講師画面デバッグページ"""
     room = room_manager.get_room(room_id)
+    
+    # ルームが存在しない場合はデフォルト教材で作成
+    if not room:
+        print(f"デバッグ: ルーム {room_id} が存在しないため、デフォルト教材で作成します")
+        default_material_id = "⑧鉄筋工事１"
+        instructor_id = "debug_instructor"
+        room = room_manager.create_room(room_id, default_material_id, instructor_id)
+        print(f"デバッグ: ルーム作成完了: {room_id}, 教材: {default_material_id}")
+    
     material_id = room.material_id if room else None
     return render_template("debug_instructor.html", room_id=room_id, material_id=material_id)
 
