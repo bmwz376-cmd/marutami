@@ -10,7 +10,28 @@ class Viewer {
         this.maxZoom = 4.0;
         this.zoomStep = 0.25;
         
-        // DOM要素
+        // DOM要素（後で初期化）
+        this.pageImage = null;
+        this.pageContainer = null;
+        this.currentPageEl = null;
+        this.totalPagesEl = null;
+        this.totalPagesDisplayEl = null;
+        this.zoomLevelEl = null;
+        this.thumbnailsContainer = null;
+        this.materialTitleEl = null;
+        
+        // パン操作
+        this.isPanning = false;
+        this.panStart = {x: 0, y: 0};
+        this.panOffset = {x: 0, y: 0};
+        
+        this.initialized = false;
+    }
+    
+    init() {
+        if (this.initialized) return;
+        
+        // DOM要素取得
         this.pageImage = document.getElementById('page-image');
         this.pageContainer = document.getElementById('page-container');
         this.currentPageEl = document.getElementById('current-page');
@@ -20,23 +41,39 @@ class Viewer {
         this.thumbnailsContainer = document.getElementById('thumbnails-container');
         this.materialTitleEl = document.getElementById('material-title');
         
-        // パン操作
-        this.isPanning = false;
-        this.panStart = {x: 0, y: 0};
-        this.panOffset = {x: 0, y: 0};
-        
         this.setupEventListeners();
+        this.initialized = true;
+        
+        console.log('Viewer initialized');
     }
     
     async loadMaterial(materialId) {
+        // 初期化されていなければ初期化
+        if (!this.initialized) {
+            this.init();
+        }
+        
         try {
+            console.log('教材読み込み開始:', materialId);
             const response = await fetch(`/api/materials/${materialId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             this.materialData = await response.json();
+            console.log('教材データ取得成功:', this.materialData);
             
             // UI更新
-            this.materialTitleEl.textContent = this.materialData.title;
-            this.totalPagesEl.textContent = this.materialData.total_pages;
-            this.totalPagesDisplayEl.textContent = this.materialData.total_pages;
+            if (this.materialTitleEl) {
+                this.materialTitleEl.textContent = this.materialData.title;
+            }
+            if (this.totalPagesEl) {
+                this.totalPagesEl.textContent = this.materialData.total_pages;
+            }
+            if (this.totalPagesDisplayEl) {
+                this.totalPagesDisplayEl.textContent = this.materialData.total_pages;
+            }
             
             // サムネイル生成
             this.renderThumbnails();
@@ -44,11 +81,13 @@ class Viewer {
             // 最初のページ表示
             this.goToPage(1);
             
+            console.log('教材読み込み完了');
             return this.materialData;
             
         } catch (error) {
             console.error('教材読み込みエラー:', error);
-            alert('教材の読み込みに失敗しました');
+            alert('教材の読み込みに失敗しました: ' + error.message);
+            throw error;
         }
     }
     

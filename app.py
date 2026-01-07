@@ -58,6 +58,14 @@ def test_annotations():
     return render_template("test_annotations.html")
 
 
+@app.route("/debug/instructor/<room_id>")
+def debug_instructor(room_id):
+    """講師画面デバッグページ"""
+    room = room_manager.get_room(room_id)
+    material_id = room.material_id if room else None
+    return render_template("debug_instructor.html", room_id=room_id, material_id=material_id)
+
+
 @app.route("/admin")
 def admin_view():
     """管理画面"""

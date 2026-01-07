@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デバッグ - 講師画面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .debug-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .status {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        #console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 講師画面デバッグツール</h1>
+    
+    <div class="debug-section">
+        <h2>1. 基本情報</h2>
+        <div class="status info">
+            <strong>ルームID:</strong> <span id="room-id">{{ room_id }}</span>
+        </div>
+        <div class="status info">
+            <strong>教材ID:</strong> <span id="material-id">{{ material_id }}</span>
+        </div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>2. JavaScript読み込み状態</h2>
+        <div id="js-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>3. APIテスト</h2>
+        <button onclick="testMaterialAPI()">教材APIをテスト</button>
+        <button onclick="testRoomAPI()">ルームAPIをテスト</button>
+        <div id="api-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>4. 初期化テスト</h2>
+        <button onclick="testViewerInit()">Viewerを初期化</button>
+        <button onclick="testAnnotationLayer()">AnnotationLayerをテスト</button>
+        <div id="init-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>5. コンソール出力</h2>
+        <button onclick="clearConsole()">クリア</button>
+        <div id="console-output"></div>
+    </div>
+
+    <script src="/static/js/viewer.js"></script>
+    <script src="/static/js/annotations.js"></script>
+    <script src="/static/js/sync.js"></script>
+    <script src="/static/js/instructor.js"></script>
+    
+    <script>
+        const roomId = "{{ room_id }}";
+        const materialId = "{{ material_id }}";
+        
+        // コンソール出力をキャプチャ
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToConsole(type, ...args) {
+            const message = args.map(arg => {
+                if (typeof arg === 'object') {
+                    return JSON.stringify(arg, null, 2);
+                }
+                return String(arg);
+            }).join(' ');
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'warn' ? '⚠️' : '✓';
+            consoleOutput.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole('log', ...args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole('error', ...args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole('warn', ...args);
+        };
+        
+        function clearConsole() {
+            consoleOutput.textContent = '';
+        }
+        
+        // JavaScript読み込み状態チェック
+        function checkJSStatus() {
+            const status = document.getElementById('js-status');
+            let html = '';
+            
+            const checks = [
+                { name: 'Viewer', obj: typeof Viewer !== 'undefined' },
+                { name: 'AnnotationLayer', obj: typeof AnnotationLayer !== 'undefined' },
+                { name: 'SyncManager', obj: typeof SyncManager !== 'undefined' },
+                { name: 'InstructorController', obj: typeof InstructorController !== 'undefined' },
+                { name: 'viewer (instance)', obj: typeof viewer !== 'undefined' },
+                { name: 'instructor (instance)', obj: typeof instructor !== 'undefined' },
+                { name: 'sync (instance)', obj: typeof sync !== 'undefined' }
+            ];
+            
+            checks.forEach(check => {
+                const className = check.obj ? 'success' : 'error';
+                const icon = check.obj ? '✅' : '❌';
+                html += `<div class="status ${className}">${icon} ${check.name}: ${check.obj ? 'OK' : 'NG'}</div>`;
+            });
+            
+            status.innerHTML = html;
+        }
+        
+        async function testMaterialAPI() {
+            const status = document.getElementById('api-status');
+            console.log('教材APIテスト開始:', materialId);
+            
+            try {
+                const response = await fetch(`/api/materials/${materialId}`);
+                const data = await response.json();
+                console.log('教材API成功:', data);
+                status.innerHTML = `<div class="status success">✅ 教材API成功: ${data.title}, ${data.total_pages}ページ</div>`;
+            } catch (error) {
+                console.error('教材APIエラー:', error);
+                status.innerHTML = `<div class="status error">❌ 教材APIエラー: ${error.message}</div>`;
+            }
+        }
+        
+        async function testRoomAPI() {
+            const status = document.getElementById('api-status');
+            console.log('ルームAPIテスト開始:', roomId);
+            
+            try {
+                const response = await fetch(`/api/rooms/${roomId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('ルームAPI成功:', data);
+                    status.innerHTML += `<div class="status success">✅ ルームAPI成功: ${JSON.stringify(data)}</div>`;
+                } else {
+                    console.warn('ルームが見つかりません');
+                    status.innerHTML += `<div class="status error">⚠️ ルームが見つかりません (404)</div>`;
+                }
+            } catch (error) {
+                console.error('ルームAPIエラー:', error);
+                status.innerHTML += `<div class="status error">❌ ルームAPIエラー: ${error.message}</div>`;
+            }
+        }
+        
+        async function testViewerInit() {
+            const status = document.getElementById('init-status');
+            console.log('Viewer初期化テスト:', materialId);
+            
+            try {
+                if (typeof viewer === 'undefined') {
+                    throw new Error('viewerが定義されていません');
+                }
+                
+                await viewer.loadMaterial(materialId);
+                console.log('Viewer初期化成功');
+                status.innerHTML = `<div class="status success">✅ Viewer初期化成功</div>`;
+            } catch (error) {
+                console.error('Viewer初期化エラー:', error);
+                status.innerHTML = `<div class="status error">❌ Viewer初期化エラー: ${error.message}</div>`;
+            }
+        }
+        
+        function testAnnotationLayer() {
+            const status = document.getElementById('init-status');
+            console.log('AnnotationLayerテスト');
+            
+            try {
+                const layer = new AnnotationLayer('test-layer');
+                console.log('AnnotationLayer作成成功:', layer);
+                status.innerHTML += `<div class="status success">✅ AnnotationLayer作成成功</div>`;
+            } catch (error) {
+                console.error('AnnotationLayerエラー:', error);
+                status.innerHTML += `<div class="status error">❌ AnnotationLayerエラー: ${error.message}</div>`;
+            }
+        }
+        
+        // ページ読み込み時に自動チェック
+        window.addEventListener('load', () => {
+            console.log('=== デバッグツール起動 ===');
+            console.log('roomId:', roomId);
+            console.log('materialId:', materialId);
+            checkJSStatus();
+        });
+    </script>
+</body>
+</html>
